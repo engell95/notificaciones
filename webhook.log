@@ -1,0 +1,18 @@
+2020-12-19 16:23:31
+
+
+2020-12-19 16:24:58
+{"update_id":381550240,
+"message":{"message_id":3,"from":{"id":1363163447,"is_bot":false,"first_name":"Engell","last_name":"Lopez","language_code":"es"},"chat":{"id":1363163447,"first_name":"Engell","last_name":"Lopez","type":"private"},"date":1608391498,"text":"Probando"}}
+
+2020-12-19 16:57:41
+{"update_id":381550241,
+"message":{"message_id":4,"from":{"id":1363163447,"is_bot":false,"first_name":"Engell","last_name":"Lopez","language_code":"es"},"chat":{"id":1363163447,"first_name":"Engell","last_name":"Lopez","type":"private"},"date":1608393461,"text":"probando"}}
+
+2020-12-19 17:21:56
+{"update_id":381550242,
+"message":{"message_id":6,"from":{"id":1363163447,"is_bot":false,"first_name":"Engell","last_name":"Lopez","language_code":"es"},"chat":{"id":-237503884,"title":"Yota Notificaciones","type":"group","all_members_are_administrators":true},"date":1608394915,"group_chat_created":true}}
+
+2020-12-21 16:34:59
+
+
