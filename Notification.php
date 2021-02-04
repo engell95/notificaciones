@@ -46,7 +46,7 @@ class Notification{
     * @version 1.0
     **/
     private static function EmailaddAddress(){
-        $addAddress = array('elopez@yotateam.com.ni','apotosme@yotateam.com.ni');
+        $addAddress = array('elopez@yotateam.com.ni','gflores@yotateam.com.ni');
         return $addAddress;
     }
 
@@ -61,6 +61,7 @@ class Notification{
     **/
     public static function sendMessage($chatId, $message)
     {
+        echo 'da';
         $response = '';
         $URL = Notification::TelegramConnection();
         $query = http_build_query(array(
@@ -69,7 +70,7 @@ class Notification{
             'parse_mode'=> "HTML", // Optional: Markdown | HTML
         ));
 
-        $response = file_get_contents("$URL/sendMessage?$query");
+        echo $response = file_get_contents("$URL/sendMessage?$query");
         return $response;
     }
 
@@ -92,18 +93,82 @@ class Notification{
             $response = 'Error el correo no posee cuerpo';
         }
         else{
+
             $Emailmessage = '
-            <!DOCTYPE html>
-            <html>
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            <html xmlns="http://www.w3.org/1999/xhtml" lang="en-GB">
             <head>
-                <meta charset="utf-8" />
+                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+                <title>Yota de Nicaragua</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+                <style type="text/css">
+                a[x-apple-data-detectors] {color: inherit !important;}
+                </style>
             </head>
-            <body>
-                <div style="display: grid;">
-                    <label style="font-weight: bold;">Correo informativo.</label><br/><br/>
-                    '.$message.'<br/><br/>
-                    <label style="font-weight: bold;color: #01A0C6 !important;">Yota de Nicaragua S.A</label>
-                </div>
+            <body style="margin: 0; padding: 0;">
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td style="padding: 20px 0 30px 0;">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse; border: 1px solid #cccccc;">
+                        <tr>
+                        <td bgcolor="#ffffff" style="padding: 40px 30px 40px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
+                                <tr>
+                                    <td style="color: #153643; font-family: Arial, sans-serif;">
+                                    <h1 style="font-size: 24px; margin: 0;">¡Notificaciones Yota - Tasa de Cambio!</h1>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 24px; padding: 20px 0 0 0;">
+                                        <p style="margin: 0;"> '.$message.'</p></br>
+                                    </td>
+                                </tr>
+                            </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td bgcolor="#50a1c6" style="padding: 15px 15px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
+                                <tr>
+                                <td style="color: #ffffff; font-family: Arial, sans-serif; font-size: 14px;">
+                                    <p style="margin: 0;">
+                                    <strong>Centro de contacto 24/7</strong><br/>
+                                    Teléfono: 2253-8225 / 8244-8888<br/>
+                                    Correo: <strong>miyota@yotateam.com.ni</strong></br></br>
+                                    <strong>Oficinas Administrativas</strong><br>
+                                Villa Fontana, Edificio Discover II,7mo Piso.</p>
+                                </td>
+                                <td align="right">
+                                <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                                    <tr>
+                                    <td>
+                                        <a href="https://twitter.com/yota_nic">
+                                        <img src="https://yota.com.ni/assets/img/TWITTER.png" alt="Twitter." width="25" height="25" style="display: block;" border="0" />
+                                        </a>
+                                    </td>
+                                    <td style="font-size: 0; line-height: 0;" width="20">&nbsp;</td>
+                                    <td>
+                                        <a href="https://www.facebook.com/YotadeNicaragua/">
+                                        <img src="https://yota.com.ni/assets/img/_FACEBOOK.png" alt="Facebook." width="25" height="25" style="display: block;" border="0" />
+                                        </a>
+                                    </td>
+                                    <td style="font-size: 0; line-height: 0;" width="20">&nbsp;</td>
+                                    <td>
+                                        <a href="https://www.instagram.com/yota_ni/">
+                                        <img src="https://yota.com.ni/assets/img/_INSTAGRAM.png" alt="Instragram." width="25" height="25" style="display: block;" border="0" />
+                                        </a>
+                                    </td>
+                                    </tr>
+                                </table>
+                                </td>
+                            </tr>
+                            </table>
+                        </td>
+                        </tr>
+                    </table>
+                    </td>
+                </tr>
+                </table>
             </body>
             </html>';
 
@@ -128,7 +193,7 @@ class Notification{
                 $mail->IsHTML(true);
                 $mail->CharSet  = 'UTF-8';
                 $mail->Encoding = 'base64';
-                $mail->Subject  = 'Notificaciones YOTA';
+                $mail->Subject  = '¡Notificaciones Yota - Tasa de Cambio!';
                 $mail->MsgHTML($Emailmessage);
                 foreach ($Emails as $key => $val) {
                     $mail->addAddress($val);

@@ -36,7 +36,7 @@
     {
         try
         {
-            $mysqli = new mysqli('localhost','portalyota','portalyota','SystemSecurity',3307) or die();
+            $mysqli = new mysqli('localhost','portalyota','8306&$=pFjmEA','SystemSecurity') or die();
             $mysqli->set_charset("utf8");
             return $mysqli;
         }
@@ -60,9 +60,8 @@
         $query = "CALL Pa_ExchangeRate_Insert('$Date',$Rate,1);";
         $mysqli = SecurityConnection();
         $result = $mysqli->query($query);
-        if (!$result) {
-            $return = $mysqli->error;
-        }
+        if(!$result)
+        $return = $mysqli->error;
         $mysqli->close();
         return $return;
     }
@@ -80,6 +79,7 @@
         $response = "";
         $message  = "";
         $query    = "";
+        $store    = "";
         $Parameters = array();
         $datenow    = date("d-m-Y");
         $datenow    = date("d-m-Y",strtotime($datenow."+ 1 month"));
@@ -107,7 +107,7 @@
                                 $rate = $a3;
                             }
                         }           //Terminado este For, pasa a la Siguiente Fecha
-                        $store  = get_Rate($date,$rate);  //Almacenamos tasa de cambio
+                        $store = get_Rate($date,$rate);  //Almacenamos tasa de cambio
                         if(!empty($store)){
                             $message .=  "<code>Fecha ".$date." Tasa de cambio ".$rate ."No almacenada!\n".$store."</code>\n";
                         }
@@ -120,10 +120,10 @@
 
         //Resultado del proceso
         if(!empty($message)){
-            $response = "<strong>El proceso de almacenado para tasa de cambio finalizo con errores </strong>\n<strong>Detalles</strong>\n".$message;
+            $response = "<strong>El proceso de almacenado para tasa de cambio finalizo con errores </strong>\n<strong>Detalles:</strong>\n".$message;
         }
         else{
-            $response = '<strong>El proceso de almacenado para tasa de cambio finalizo Satisfactoriamente!!</strong>';
+            $response = "<strong>El proceso de almacenado para tasa de cambio del mes ".$datedata[1]." del año ".$datedata[2]." finalizo Satisfactoriamente!!</strong>";
         }
         $return .= '-------------------------';
         $return .= $response;
@@ -131,10 +131,10 @@
         //Telegram
         $chatId = '-237503884';
         $return .= $Notification->sendMessage($chatId, $response);
-        $return .= '-------------------------';
+        $return .= '-------------------------<br>';
         //Email
-        //$return .= $Notification->SendEmail($response);
-        $return .= '-------------------------';
+        $return .= $Notification->SendEmail($response);
+        $return .= '-------------------------<br>';
         //Log txt
         $date = date('Y-m-d H:i:s');
         $content = "$date\n$return\n\n";
