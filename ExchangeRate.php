@@ -1,5 +1,4 @@
 <?php
-    require_once 'Notification.php';
 
     /**
     * CONEXION AL SERVICIO DEL BCN
@@ -27,7 +26,7 @@
     }
 
     /**
-    * CONEXION DB
+    * CONEXION DB MYSQL
     *
     * @return array
     * @version 1.0
@@ -36,35 +35,224 @@
     {
         try
         {
-            $mysqli = new mysqli('localhost','portalyota','8306&$=pFjmEA','SystemSecurity') or die();
-            $mysqli->set_charset("utf8");
+            $mysqli = new mysqli('10.202.128.158','usr_app','8259&$=cGbnOU','SystemSecurity') or die(mysqli_error());
+            if (!mysqli_connect_error()) {
+                $mysqli->set_charset("utf8");
+            }
             return $mysqli;
         }
         catch (exception $e)
         {
-            echo mysqli_errno($mysqli) . ": " . mysqli_error($mysqli) . "\n";
+            return mysqli_errno($mysqli) . ": " . mysqli_error($mysqli) . "\n";
         }
+    }
+
+    /**
+    * CONEXION DB SQL
+    *
+    * @return array
+    * @version 1.0
+    **/
+    function CySConnection()
+    {
+        try
+        {
+            $connectionInfo = array("UID" => 'cnx_budgeting', "PWD" => '&_=)%$DBW85875ndkd', "Database" => 'YOTA_CONTA','CharacterSet' => 'UTF-8','ConnectionPooling' => true,'MultipleActiveResultSets' => true);
+            $connectionhost = '10.91.0.138\SQLYOTA_CONTA';
+            sqlsrv_configure('WarningsReturnAsErrors',0);
+            $connection = sqlsrv_connect($connectionhost, $connectionInfo);
+            if (!$connection) {
+                die( print_r( sqlsrv_errors(), true));
+            }
+            return $connection;
+        }
+        catch (exception $e)
+        {
+            echo $e->getMessage() . "\n";
+        }
+    }
+
+    /**
+    * CONFIGURACION PARA CONEXION DE TELEGRAM
+    *
+    * @return string
+    * @version 1.0
+    **/
+    function TelegramConnection()
+    {
+        $TOKEN    = "1427879019:AAEFBQyRGszax7z9lKwKMlv9UUlpzx-OW-w";
+        $TELEGRAM = "https://api.telegram.org:443/bot$TOKEN";
+        return $TELEGRAM;
+    }
+
+     /**
+    * ENVIO DE MENSAJES POR TELEGRAM
+    *
+    * @param  string   $chatId  [Id de la conversación de destino]
+    * @param  string   $message [Mensaje en formato html]
+    * @version 1.0
+    * @return array
+    **/
+    function sendMessage($chatId, $message)
+    {
+        $response = '';
+        $URL      = TelegramConnection();
+        $query = http_build_query(array(
+            'chat_id'=> $chatId,
+            'text'=> $message,
+            'parse_mode'=> "HTML", // Optional: Markdown | HTML
+        ));
+
+        $response = file_get_contents("$URL/sendMessage?$query");
+        return $response;
+    }
+
+    /**
+    * ENVIO DE CORREOS POR SMTP
+    *
+    * @param  string   $message [Cuerpo del correo]
+    * @version 1.0
+    * @return string
+    **/
+    function SendEmail($message)
+    {
+        $response = '';
+        //CONFIGURACION PARA CONEXION DE ENVIO DE EMAIL
+        $SERVER = 'mail.yotateam.com.ni'; 
+        $PORT = 587;
+        $SENDER = 'notifications@yotateam.com.ni';                  
+        $USER   = 'notifications@yotateam.com.ni';        
+        $PASSWORD   = "G7mEZXH5DS";
+        //DIRECCIONES PARA NOTIFICACIONES
+        $addAddress = array('elopez@yotateam.com.ni','apotosme@yotateam.com.ni','gflores@yotateam.com.ni','jtorres@yotateam.com.ni','mpalacios@yotateam.com.ni','mmiranda@yotateam.com.ni');
+
+        foreach ($addAddress as $key => $val) {
+            $RECEIVER   = $val;
+            //EJECUTANDO COMANDOS
+            $response .= exec('swaks --to ' . $RECEIVER . ' --from "' . $SENDER . '" --header "Subject: ¡Notificaciones Yota - Tasa de Cambio!" --body "' . $message . '" --server ' . $SERVER . ' --port ' . $PORT . ' --timeout 10s --auth LOGIN --auth-user "' . $USER . '" --auth-password "' . $PASSWORD . '" -tls');
+        }
+
+        return $response;
     }
 
     /**
     * ALMACENADO DE TASA DE CAMBIO
     *
     * @return string
-    * @param  string   $Date  [Fecha de la tasa]
-    * @param  string   $Rate  [Tasa de cambio en cordobas]
+    * @param  string   $Curreny  [Moneda para cys]
+    * @param  string   $Details  [fechas y tasas de cambio]
+    * @param  integer  $CounDetails [cantidad de items]
     * @version 1.0
     **/
-    function get_Rate($Date,$Rate)
+    function get_Rate($Curreny,$Details,$CounDetails)
     {
+        $v_return = '';
+        $v_return .= Mysql_Store($Details,$CounDetails);
+        $v_return .= Sql_Store($Curreny,$Details,$CounDetails);
+        return $v_return;
+    }
+
+    /**
+    * ALMACENADO DE TASA DE CAMBIO EN MYSQL
+    *
+    * @return string
+    * @param  string   $Details  [fechas y tasas de cambio]
+    * @param  integer  $CounDetails [cantidad de items]
+    * @version 1.0
+    **/
+    function Mysql_Store($Details,$CounDetails){
         $return = '';
-        $query = "CALL Pa_ExchangeRate_Insert('$Date',$Rate,1);";
+        $query  = "CALL Pa_ExchangeRate_Insert('$Details',$CounDetails,1);";
         $mysqli = SecurityConnection();
-        $result = $mysqli->query($query);
-        if(!$result)
-        $return = $mysqli->error;
-        $mysqli->close();
+
+        if($mysqli->connect_error){
+           $return .= $mysqli->connect_error;
+           return $return;
+        }
+        else{
+            $result  = $mysqli->query($query);
+            if(!$result){
+                $return .= $result;
+            }
+            $mysqli->close();
+        }
+
         return $return;
     }
+
+    /**
+    * ALMACENADO DE TASA DE CAMBIO EN SQL
+    *
+    * @return string
+    * @param  string   $Curreny  [Moneda para cys]
+    * @param  string   $Details  [fechas y tasas de cambio]
+    * @param  integer  $CounDetails [cantidad de items]
+    * @version 1.0
+    **/
+    function Sql_Store($Curreny,$Details,$CounDetails){
+
+        $return = '';
+        $execute  = "{call Pa_TipoCambio_Insert(?,?,?)}";
+        $params   = array($Curreny,$Details,$CounDetails); 
+        $procedure_params = array(
+            array($Curreny),
+            array($Details),
+            array($CounDetails)
+        );
+        $conn = CySConnection();
+        if ( ($stmt = sqlsrv_query($conn, $execute, $procedure_params)))
+        {
+            do
+            {
+                while( ($row=sqlsrv_fetch_array($stmt)) )
+                {
+                    $return .=  utf8_encode($row[0]);
+                }
+            } while ( ($resultsql = sqlsrv_next_result($stmt)) );
+        }
+        else{
+            $return .= DisplayErrors();
+            return $return;
+        }
+
+        if ( $resultsql === false )
+        {
+            $return .= DisplayErrors();  
+            return $return;
+        }
+
+        sqlsrv_free_stmt($stmt);
+        sqlsrv_close($conn);
+        return $return;
+    }
+
+    /* ------------- Error Handling Functions --------------*/  
+    function DisplayErrors()  
+    {   
+         $message = '';
+         $errors  = sqlsrv_errors(SQLSRV_ERR_ERRORS);  
+         foreach( $errors as $error )  
+         {  
+            $message .= "<br />SQLSTATE: ".$error[ 'SQLSTATE']."<br />";
+            $message .=  "code: ".$error[ 'code']."<br />";
+            $message .=  "message: ".$error[ 'message']."<br />"; 
+         }  
+         return $message;
+    }  
+      
+    function DisplayWarnings()  
+    {    
+         $message = '';
+         $warnings = sqlsrv_errors(SQLSRV_ERR_WARNINGS);  
+         if(!is_null($warnings))  
+         {  
+              foreach( $warnings as $warning )  
+              {  
+                   $warnings .= "Warning: ".$warning['message']."\n";  
+              }  
+         }  
+         return $message;
+    } 
 
     /**
     * DIRECCIONES PARA NOTIFICACIONES
@@ -74,7 +262,6 @@
     **/
     function get_exchangerate_Month()
     {
-        $Notification = new Notification();
         $return   = "";
         $response = "";
         $message  = "";
@@ -84,8 +271,24 @@
         $datenow    = date("d-m-Y");
         $datenow    = date("d-m-Y",strtotime($datenow."+ 1 month"));
         $datedata   = explode('-',$datenow);
-        $Parameters['Mes'] = $datedata[1];
-        $Parameters['Ano'] = $datedata[2];
+        $day    = (int)$datedata[0];
+        $month  = (int)$datedata[1];
+        $year   = (int)$datedata[2];
+
+        if ($day == 1) {
+            $month = ($month - 1);
+
+            if ($month == 0) {
+                $month = 12;    
+                $year  = ($year - 1);
+            }
+
+            $Parameters['Mes'] = $month;
+        }
+        else{
+            $Parameters['Mes'] = 4;//$datedata[1];
+        }
+        $Parameters['Ano'] = $year;
         $Connection = ConnectionBCN();
         if (isset($Connection->sdl)) {
             $query  = $Connection->__soapCall("RecuperaTC_Mes", array($Parameters));
@@ -93,8 +296,10 @@
             $ValorDelXML = $Class['any'];
             $xml = simplexml_load_string($ValorDelXML);
             $array = (array) $xml;
+            $items = ''; 
+            $count = 0; 
             if(empty($array)){
-                $message =  "<code>Tasa de cambio no disponible para el mes ".$datedata[1]." del año ".$datedata[2]."</code>\n";
+                $message =  "<code>Tasa de cambio no disponible para el mes ".$Parameters['Mes']." del año ".$Parameters['Ano']."</code>\n";
             }
             else{
                 foreach ($array as $key => $a) {                    //Recorremos el arreglo con todos los Datos
@@ -106,12 +311,15 @@
                             else if($key3 == "Valor"){
                                 $rate = $a3;
                             }
-                        }           //Terminado este For, pasa a la Siguiente Fecha
-                        $store = get_Rate($date,$rate);  //Almacenamos tasa de cambio
-                        if(!empty($store)){
-                            $message .=  "<code>Fecha ".$date." Tasa de cambio ".$rate ."No almacenada!\n".$store."</code>\n";
-                        }
+                        } 
+                        $items .= $date.'|'.$rate.'||';
+                        $count = $count + 1;
                     }
+                }
+                // process insert
+                $store = get_Rate('DOL',$items,$count);
+                if(!empty($store)){
+                    $message .=  $store;
                 }
             }
         }else{
@@ -123,17 +331,17 @@
             $response = "<strong>El proceso de almacenado para tasa de cambio finalizo con errores </strong>\n<strong>Detalles:</strong>\n".$message;
         }
         else{
-            $response = "<strong>El proceso de almacenado para tasa de cambio del mes ".$datedata[1]." del año ".$datedata[2]." finalizo Satisfactoriamente!!</strong>";
+            $response = "<strong>El proceso de almacenado para tasa de cambio del mes ".$Parameters['Mes']." del año ".$Parameters['Ano']." finalizo Satisfactoriamente!!</strong>";
         }
         $return .= '-------------------------';
         $return .= $response;
         $return .= '-------------------------';
         //Telegram
         $chatId = '-237503884';
-        $return .= $Notification->sendMessage($chatId, $response);
+        $return .= sendMessage($chatId, $response);
         $return .= '-------------------------<br>';
         //Email
-        $return .= $Notification->SendEmail($response);
+        $return .= SendEmail($response);
         $return .= '-------------------------<br>';
         //Log txt
         $date = date('Y-m-d H:i:s');
