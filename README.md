@@ -13,10 +13,10 @@ _Estas instrucciones te permitirán obtener una copia del proyecto en funcionami
 ### Pre-requisitos 📋
 
 - Servidor apache o nginx
-- Servidor cn-maestro
 - Bot de telegram
 - SMTP
 - DB MYSQL
+- DB SQL
 
 ## Autores ✒️
 
