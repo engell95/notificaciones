@@ -35,7 +35,7 @@
     {
         try
         {
-            $mysqli = new mysqli('10.202.128.158','usr_app','8259&$=cGbnOU','SystemSecurity') or die(mysqli_error());
+            $mysqli = new mysqli('','usr_app','','') or die(mysqli_error());
             if (!mysqli_connect_error()) {
                 $mysqli->set_charset("utf8");
             }
@@ -57,8 +57,8 @@
     {
         try
         {
-            $connectionInfo = array("UID" => 'cnx_budgeting', "PWD" => '&_=)%$DBW85875ndkd', "Database" => 'YOTA_CONTA','CharacterSet' => 'UTF-8','ConnectionPooling' => true,'MultipleActiveResultSets' => true);
-            $connectionhost = '10.91.0.138\SQLYOTA_CONTA';
+            $connectionInfo = array("UID" => 'cnx_budgeting', "PWD" => '', "Database" => '','CharacterSet' => 'UTF-8','ConnectionPooling' => true,'MultipleActiveResultSets' => true);
+            $connectionhost = '';
             sqlsrv_configure('WarningsReturnAsErrors',0);
             $connection = sqlsrv_connect($connectionhost, $connectionInfo);
             if (!$connection) {
@@ -118,13 +118,13 @@
     {
         $response = '';
         //CONFIGURACION PARA CONEXION DE ENVIO DE EMAIL
-        $SERVER = 'mail.yotateam.com.ni'; 
+        $SERVER = ''; 
         $PORT = 587;
-        $SENDER = 'notifications@yotateam.com.ni';                  
-        $USER   = 'notifications@yotateam.com.ni';        
-        $PASSWORD   = "G7mEZXH5DS";
+        $SENDER = '';                  
+        $USER   = '';        
+        $PASSWORD   = "";
         //DIRECCIONES PARA NOTIFICACIONES
-        $addAddress = array('elopez@yotateam.com.ni','apotosme@yotateam.com.ni','gflores@yotateam.com.ni','jtorres@yotateam.com.ni','mpalacios@yotateam.com.ni','mmiranda@yotateam.com.ni');
+        $addAddress = array('','','','','','');
 
         foreach ($addAddress as $key => $val) {
             $RECEIVER   = $val;
